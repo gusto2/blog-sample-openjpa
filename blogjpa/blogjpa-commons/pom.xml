@@ -27,6 +27,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Export-Package>com.apogado.blogjpa.commons</Export-Package>
                         <Import-Package>
                             org.apache.openjpa.enhance,

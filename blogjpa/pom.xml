@@ -8,5 +8,8 @@
   <name>blogjpa</name>
     <modules>
     <module>blogjpa-commons</module>
+    <module>blogjpa-store</module>
+    <module>blogjpa-feature</module>
+    <module>blogjpa-datasource</module>
   </modules>
 </project>

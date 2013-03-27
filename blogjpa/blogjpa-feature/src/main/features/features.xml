@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="ocm-features">
+    <feature name="blogjpa" version="1.0.0-SNAPSHOT">
+        
+<!-- feature url: mvn:com.apogado.blogjpa/blogjpa-feature/1.0.0-SNAPSHOT/xml/features -->
+
+        <!-- feature dependencies -->
+        <feature>jpa</feature>
+        <feature>http</feature>
+        <feature>jndi</feature>
+        <feature>transaction</feature>
+        <!-- individual library dependencies -->
+        <bundle>mvn:commons-collections/commons-collections/3.2.1</bundle>
+        <bundle>mvn:commons-pool/commons-pool/1.5</bundle>
+        <bundle>mvn:commons-dbcp/commons-dbcp/1.4</bundle>
+        <bundle>mvn:commons-lang/commons-lang/2.5</bundle>
+        <bundle>mvn:net.sourceforge.serp/com.springsource.serp/1.13.1</bundle>
+        <bundle>mvn:org.osgi/org.osgi.enterprise/5.0.0</bundle>
+        <bundle>mvn:org.osgi/org.osgi.compendium/4.3.0</bundle>
+        
+        <!-- install openjpa -->
+        <bundle>mvn:org.apache.openjpa/openjpa/2.2.0</bundle>
+        
+        <!-- install db client -->
+        <bundle>mvn:org.apache.derby/derbyclient/10.9.1.0</bundle>
+        <!-- application bundles -->
+        <bundle>mvn:com.apogado.blogjpa/blogjpa-commons/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:com.apogado.blogjpa/blogjpa-datasource/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:com.apogado.blogjpa/blogjpa-store/1.0.0-SNAPSHOT</bundle>
+
+    </feature>
+</features>
