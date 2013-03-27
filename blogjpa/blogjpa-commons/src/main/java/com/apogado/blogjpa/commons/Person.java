@@ -12,8 +12,8 @@ import javax.persistence.NamedQuery;
  * example entity object
  * @author Gabriel Vince
  */
-@Entity
-@NamedQuery(name = "Person.findById",query = "SELECT p FROM Person WHERE p.id = :id")
+@Entity(name = "Person")
+@NamedQuery(name = "Person.findById",query = "SELECT p FROM Person p WHERE p.id = :id")
 public class Person implements Serializable {
     
     public static final String QUERY_FIND_BY_ID = "Person.findById";
