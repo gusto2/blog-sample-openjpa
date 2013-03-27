@@ -17,8 +17,9 @@
         <property name="user" value="app" />
         <property name="password" value="app" />
         <property name="portNumber" value="1527" />
+        <property name="createDatabase" value="create" />
     </bean>
-    <!-- register the data source as a osgi service and enrol with JNDI -->
+    <!-- register the data source as an osgi service  -->
     <service id="xaDataSource" ref="derbyXaDataSource" interface="javax.sql.XADataSource">
         <service-properties>
             <entry key="osgi.jndi.service.name" value="jdbc/test"/>
