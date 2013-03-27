@@ -29,12 +29,7 @@
                     <instructions>
                         <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Export-Package>com.apogado.blogjpa.commons</Export-Package>
-                        <Import-Package>
-                            org.apache.openjpa.enhance,
-                            org.apache.openjpa.util,                            
-                            serp.*,
-                            *                            
-                        </Import-Package>
+                        <Import-Package>*</Import-Package>                        
                     </instructions>
                 </configuration>
             </plugin>
