@@ -9,7 +9,8 @@
         <feature>http</feature>
         <feature>jndi</feature>
         <feature>transaction</feature>
-        <!-- individual library dependencies -->
+        
+        <!-- openjpa library dependencies -->
         <bundle>mvn:commons-collections/commons-collections/3.2.1</bundle>
         <bundle>mvn:commons-pool/commons-pool/1.5</bundle>
         <bundle>mvn:commons-dbcp/commons-dbcp/1.4</bundle>
@@ -23,6 +24,7 @@
         
         <!-- install db client -->
         <bundle>mvn:org.apache.derby/derbyclient/10.9.1.0</bundle>
+        
         <!-- application bundles -->
         <bundle>mvn:com.apogado.blogjpa/blogjpa-commons/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:com.apogado.blogjpa/blogjpa-datasource/1.0.0-SNAPSHOT</bundle>
