@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>blogjpa</artifactId>
+        <groupId>com.apogado.blogjpa</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.apogado.blogjpa</groupId>
+    <artifactId>blogjpa-commons</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <name>blogjpa-commons</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>com.apogado.blogjpa.commons</Export-Package>
+                        <Import-Package>
+                            org.apache.openjpa.enhance,
+                            org.apache.openjpa.util,                            
+                            serp.*,
+                            *                            
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <configuration>
+                            <tasks>
+                                <path id="enhance.path.ref">
+                                    <fileset dir="${project.build.outputDirectory}">
+                                        <include name="Person.class" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="enhance.files" refid="enhance.path.ref" pathsep=" " />
+                                <java classname="org.apache.openjpa.enhance.PCEnhancer">
+                                    <arg line="-p persistence.xml" />
+                                    <arg line="${enhance.files}" />
+                                    <classpath>
+                                        <path refid="maven.dependency.classpath" />
+                                        <path refid="maven.compile.classpath" />
+                                    </classpath>
+                                </java>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>                       
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.openjpa</groupId>
+            <artifactId>openjpa</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+    </dependencies>
+</project>
