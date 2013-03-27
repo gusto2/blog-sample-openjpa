@@ -39,6 +39,7 @@ public class PersonServiceImpl implements PersonService {
             if(em!=null)
             {
                 em.getTransaction().rollback();
+                
             }
         }
         finally
@@ -68,10 +69,6 @@ public class PersonServiceImpl implements PersonService {
         catch(Exception ex)
         {
             logger.log(Level.SEVERE, "createPerson", ex);
-            if(em!=null)
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {

@@ -27,13 +27,13 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <!--<Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>-->
                         <Export-Package>com.apogado.blogjpa.commons</Export-Package>
-                        <Import-Package>
+                        <import>*</import>
+<!--                        <Import-Package>
                             org.apache.openjpa.*,
                             javax.transaction.*,
                             *                                 
-                        </Import-Package>
+                        </Import-Package>-->
                     </instructions>
                 </configuration>
             </plugin>

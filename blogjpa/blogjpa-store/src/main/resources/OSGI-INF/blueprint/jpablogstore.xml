@@ -10,13 +10,9 @@
                         http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/schemas/transaction/transactionv10.xsd
                         http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/schemas/jpa/jpa_110.xsd"
 >
-
-
     <bean id="personServiceBean" class="com.apogado.blogjpa.store.PersonServiceImpl" init-method="test"  >
-        <!--<tx:transaction method="*" value="Required" />-->
         <jpa:unit property="entityManagerFactory" unitname="blogjpa" />
     </bean>
-    
     <service interface="com.apogado.blogjpa.commons.PersonService" ref="personServiceBean"/> 
-  
+ 
 </blueprint>
