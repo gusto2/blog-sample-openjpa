@@ -1,8 +1,13 @@
 package com.apogado.blogjpa.store;
 
 
+import com.apogado.blogjpa.commons.FileBlob;
 import com.apogado.blogjpa.commons.Person;
 import com.apogado.blogjpa.commons.PersonService;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +30,11 @@ public class PersonServiceImpl implements PersonService {
         {
             em = this.entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
+
+            InputStream in = new ByteArrayInputStream("Exmaple person blob".getBytes("UTF-8"));
+            FileBlob blob = new FileBlob();
+            blob.setInputStream(in);
+            p.setPersonData(blob);
             em.persist(p);
             
             if(logger.isLoggable(Level.INFO))
@@ -32,14 +42,15 @@ public class PersonServiceImpl implements PersonService {
             
             em.flush();
             em.getTransaction().commit();
+            in.close();
         }
         catch(Exception ex)
         {
             logger.log(Level.SEVERE, "createPerson", ex);
             if(em!=null)
             {
-                em.getTransaction().rollback();
-                
+                if(em.getTransaction().isActive())
+                    em.getTransaction().rollback();
             }
         }
         finally
@@ -56,10 +67,25 @@ public class PersonServiceImpl implements PersonService {
         try
         {
             em = this.entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
             p = (Person) em
                     .createNamedQuery(Person.QUERY_FIND_BY_ID)
                     .setParameter("id", id)
                     .getSingleResult();
+            // seee if there are lob data
+            InputStream in = p.getPersonData().getInputStream();
+            if(in==null)
+            {
+                logger.warning("No person blob data");
+            }
+            else
+            {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+                String personBlob = reader.readLine();
+                reader.close();
+                logger.log(Level.INFO, "Person blob: {0}",personBlob);
+            }
+            em.getTransaction().commit();
             logger.log(Level.INFO, "Person found with name: {0}",p.getName());
         }
         catch(javax.persistence.EntityNotFoundException nex)
@@ -68,12 +94,16 @@ public class PersonServiceImpl implements PersonService {
         }
         catch(Exception ex)
         {
-            logger.log(Level.SEVERE, "createPerson", ex);
+            logger.log(Level.SEVERE, "getPerson", ex);
         }
         finally
         {
             if(em!=null)
+            {
+                if(em.getTransaction().isActive())
+                    em.getTransaction().rollback();
                 em.close();
+            }
         }
         return p;    }
     
@@ -82,23 +112,31 @@ public class PersonServiceImpl implements PersonService {
      */
     public void test()
     {
-        logger.info("running");
-        if(this.entityManagerFactory!=null)
+        try
         {
-            logger.info("entity manager factory available");
-            Person p = new Person();
-            p.setName(UUID.randomUUID().toString());
-            Integer id = this.createPerson(p).getId();
-            logger.log(Level.INFO, "Person persisted with id: {0}",id);
-            p = this.getPerson(id);
-            if(p!=null)
-                logger.log(Level.INFO, "Person found with name: {0}",p.getName());
+            logger.info("running");
+            if(this.entityManagerFactory!=null)
+            {
+                logger.info("entity manager factory available");
+                Person p = new Person();
+                p.setName(UUID.randomUUID().toString());
+                Integer id = this.createPerson(p).getId();
+                
+                logger.log(Level.INFO, "Person persisted with id: {0}",id);
+                p = this.getPerson(id);
+                if(p!=null)
+                    logger.log(Level.INFO, "Person found with name: {0}",p.getName());
+                else
+                    logger.log(Level.INFO, "Person not found with id: {0}",id);
+            }
             else
-                logger.log(Level.INFO, "Person not found with id: {0}",id);
+            {
+                logger.info("entityManagerFactory is NULL !");
+            }
         }
-        else
+        catch(Exception ex)
         {
-            logger.info("entityManagerFactory is NULL !");
+            logger.log(Level.SEVERE, "test",ex);
         }
     }
 

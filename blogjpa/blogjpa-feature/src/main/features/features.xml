@@ -24,6 +24,7 @@
         
         <!-- install db client -->
         <bundle>mvn:org.apache.derby/derbyclient/10.9.1.0</bundle>
+        <bundle>wrap:mvn:postgresql/postgresql/9.1-901-1.jdbc4</bundle>
         
         <!-- application bundles -->
         <bundle>mvn:com.apogado.blogjpa/blogjpa-commons/1.0.0-SNAPSHOT</bundle>

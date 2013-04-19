@@ -26,5 +26,16 @@
         </service-properties>
     </service>
 
-  
+    <bean id="pgDatSource" class="org.postgresql.xa.PGXADataSource">
+        <property name="databaseName" value="ocm"/> 
+        <property name="serverName" value="127.0.0.1" />
+        <property name="user" value="ocm" />
+        <property name="password" value="ocm" />
+        <property name="portNumber" value="5432" />
+    </bean>
+    <service id="pgxaDataSource" ref="pgDatSource" interface="javax.sql.XADataSource">
+        <service-properties>
+            <entry key="osgi.jndi.service.name" value="jdbc/test2"/>
+        </service-properties>
+    </service>  
 </blueprint>
