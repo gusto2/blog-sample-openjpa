@@ -1,7 +1,6 @@
 package com.apogado.blogjpa.store;
 
 
-import com.apogado.blogjpa.commons.FileBlob;
 import com.apogado.blogjpa.commons.Person;
 import com.apogado.blogjpa.commons.PersonService;
 import java.io.BufferedReader;
@@ -32,9 +31,7 @@ public class PersonServiceImpl implements PersonService {
             em.getTransaction().begin();
 
             InputStream in = new ByteArrayInputStream("Exmaple person blob".getBytes("UTF-8"));
-            FileBlob blob = new FileBlob();
-            blob.setInputStream(in);
-            p.setPersonData(blob);
+            p.setPersonData(in);
             em.persist(p);
             
             if(logger.isLoggable(Level.INFO))
@@ -73,7 +70,7 @@ public class PersonServiceImpl implements PersonService {
                     .setParameter("id", id)
                     .getSingleResult();
             // seee if there are lob data
-            InputStream in = p.getPersonData().getInputStream();
+            InputStream in = p.getPersonData();
             if(in==null)
             {
                 logger.warning("No person blob data");

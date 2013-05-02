@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQuery;
+import org.apache.openjpa.persistence.Persistent;
 
 /**
  * example entity object
@@ -25,7 +26,7 @@ public class Person implements Serializable {
     private Integer id;
     private String name;
     private String address;
-    private FileBlob personData;
+    private InputStream personData;
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
@@ -53,13 +54,15 @@ public class Person implements Serializable {
         this.address = address;
     }
 
-    @Lob @Basic(fetch = FetchType.LAZY)
-    public FileBlob getPersonData() {
+    @Persistent(fetch = FetchType.LAZY)
+    public InputStream getPersonData() {
         return personData;
     }
 
-    public void setPersonData(FileBlob personData) {
+    public void setPersonData(InputStream personData) {
         this.personData = personData;
     }
+
+    
    
 }
