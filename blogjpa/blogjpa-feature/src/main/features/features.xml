@@ -9,6 +9,8 @@
         <feature>http</feature>
         <feature>jndi</feature>
         <feature>transaction</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>war</feature>
         
         <!-- openjpa library dependencies -->
         <bundle>mvn:commons-collections/commons-collections/3.2.1</bundle>
@@ -30,6 +32,8 @@
         <bundle>mvn:com.apogado.blogjpa/blogjpa-commons/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:com.apogado.blogjpa/blogjpa-datasource/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:com.apogado.blogjpa/blogjpa-store/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:com.apogado.blogjpa/blogjpa-services/1.0.0-SNAPSHOT</bundle>
+        <bundle>war:mvn:com.apogado.blogjpa/blogjpa-web/1.0.0-SNAPSHOT/war</bundle>
 
     </feature>
 </features>

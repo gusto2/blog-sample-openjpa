@@ -9,7 +9,9 @@
     <modules>
     <module>blogjpa-commons</module>
     <module>blogjpa-store</module>
-    <module>blogjpa-feature</module>
     <module>blogjpa-datasource</module>
+    <module>blogjpa-services</module>
+    <module>blogjpa-web</module>
+    <module>blogjpa-feature</module>
   </modules>
 </project>

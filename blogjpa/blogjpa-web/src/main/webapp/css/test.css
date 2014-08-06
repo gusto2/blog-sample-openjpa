@@ -1,0 +1,33 @@
+/* 
+    Document   : test
+    Created on : Jul 17, 2014, 4:22:22 PM
+    Author     : admin
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+/* table div */
+.tdiv {
+    display: table;
+    width:100%;
+}
+
+/* table row div */
+.trowdiv {
+    display: table-row;
+    width:100%;
+}
+
+/**/
+.tceldiv {
+    display: table-cell;
+    margin-left: 5px;
+}
+
+#message {
+    color: red;
+}

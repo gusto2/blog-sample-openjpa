@@ -1,5 +1,7 @@
 package com.apogado.blogjpa.commons;
 
+import java.util.List;
+
 
 /**
  * an example data access service, just show it works
@@ -21,4 +23,9 @@ public interface PersonService {
      */
     public Person getPerson(Integer id);
     
+    /**
+     * return all person records (detached, no blob access)
+     * @return 
+     */
+    public List<Person> getPersonRecords();
 }

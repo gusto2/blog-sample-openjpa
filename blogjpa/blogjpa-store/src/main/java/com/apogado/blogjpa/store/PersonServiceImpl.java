@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +32,8 @@ public class PersonServiceImpl implements PersonService {
             em = this.entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
 
-            InputStream in = new ByteArrayInputStream("Exmaple person blob".getBytes("UTF-8"));
-            p.setPersonData(in);
+//            InputStream in = new ByteArrayInputStream("Example person blob".getBytes("UTF-8"));
+//            p.setPersonData(in);
             em.persist(p);
             
             if(logger.isLoggable(Level.INFO))
@@ -39,7 +41,7 @@ public class PersonServiceImpl implements PersonService {
             
             em.flush();
             em.getTransaction().commit();
-            in.close();
+//            in.close();
         }
         catch(Exception ex)
         {
@@ -65,23 +67,21 @@ public class PersonServiceImpl implements PersonService {
         {
             em = this.entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
-            p = (Person) em
-                    .createNamedQuery(Person.QUERY_FIND_BY_ID)
-                    .setParameter("id", id)
-                    .getSingleResult();
+            p =  em
+                    .find(Person.class, id);
             // seee if there are lob data
-            InputStream in = p.getPersonData();
-            if(in==null)
-            {
-                logger.warning("No person blob data");
-            }
-            else
-            {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
-                String personBlob = reader.readLine();
-                reader.close();
-                logger.log(Level.INFO, "Person blob: {0}",personBlob);
-            }
+//            InputStream in = p.getPersonData();
+//            if(in==null)
+//            {
+//                logger.info("No person blob data");
+//            }
+//            else
+//            {
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+//                String personBlob = reader.readLine();
+//                reader.close();
+//                logger.log(Level.INFO, "Person blob: {0}",personBlob);
+//            }
             em.getTransaction().commit();
             logger.log(Level.INFO, "Person found with name: {0}",p.getName());
         }
@@ -102,7 +102,30 @@ public class PersonServiceImpl implements PersonService {
                 em.close();
             }
         }
-        return p;    }
+        return p;    
+    }
+    
+    @Override
+    public List<Person> getPersonRecords() {
+        EntityManager em = null;
+        try
+        {
+            em = this.entityManagerFactory.createEntityManager();
+            List l = em.createNamedQuery(Person.QUERY_FIND_ALL).getResultList();
+            List<Person> resultList = new ArrayList<Person>(l.size());
+            resultList.addAll(l);
+            
+            return resultList;
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        finally {
+            if(em!=null)
+                em.close();
+            
+        }
+    }
     
     /**
      * test method to test if it all works

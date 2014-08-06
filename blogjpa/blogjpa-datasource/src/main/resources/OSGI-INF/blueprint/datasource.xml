@@ -20,7 +20,7 @@
         <property name="createDatabase" value="create" />
     </bean>
     <!-- register the data source as an osgi service  -->
-    <service id="xaDataSource" ref="derbyXaDataSource" interface="javax.sql.XADataSource">
+    <service id="xaDataSource" ref="derbyXaDataSource" interface="javax.sql.DataSource">
         <service-properties>
             <entry key="osgi.jndi.service.name" value="jdbc/test"/>
         </service-properties>
@@ -38,4 +38,11 @@
             <entry key="osgi.jndi.service.name" value="jdbc/test2"/>
         </service-properties>
     </service>  
+    
+    <!-- test bean -->
+    <bean class="com.apogado.blogjpa.datasource.DsTest" init-method="test">
+        <property name="datasource" ref="derbyXaDataSource" />
+        <property name="testQuery" value="select * from SYS.SYSVIEWS" />
+    </bean>
+    
 </blueprint>

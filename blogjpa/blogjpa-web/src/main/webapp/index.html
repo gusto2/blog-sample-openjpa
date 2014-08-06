@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BlogJPA web client</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi">
+        <!--<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">-->   
+        <link rel="stylesheet" href="./css/test.css" />
+        <link rel="stylesheet" href="./css/bootstrap.css" />
+        <script src="http://yui.yahooapis.com/3.17.2/build/yui/yui-min.js"></script>
+        <!--<script src="/js/person.js"></script>-->
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body class="yui3-skin-sam">
+        <div id="message"></div>
+        <script type="text/javascript">
+            YUI().use('app', 'node', 'event', 'escape',
+                    'model', 'model-list', 'model-sync-rest', 'io', 'json-parse',
+                    function(Y) {
+
+                        function message(msg) {
+                            var node = Y.one('#message');
+                            if (!node && msg && msg != '')
+                                alert(msg);
+                            else
+                                node.setHTML(Y.Escape.html(msg));
+                        }
+
+                        // person model
+                        Y.Person = Y.Base.create('person', Y.Model, [Y.ModelSync.REST], {
+                            root: '/services/blog/person',
+                            url: '/services/blog/person/{id}',
+                            // overriding a default savw fn , just for demo purposes
+                            parse: function(response) {
+                                var resp = Y.JSON.parse(response);
+                                var person = resp.person;
+                                if(!person) {
+                                    fire('error', {type: 'parse', error: 'Unexpected message format'})
+                                }
+                                else
+                                    return person;
+                            },
+//                            load: function(callback) {
+//                                var id = this.get('id');
+//                                if (!id) {
+//                                    callback('id is not defined');
+//                                    return;
+//                                }
+//                                var url = Y.Lang.sub(this.url, this);
+//                                Y.io(url, {
+//                                    method: 'GET',
+//                                    context: this,
+//                                    on: {
+//                                        success: function(tid, xhr) {
+//                                            var resp = Y.JSON.parse(xhr.responseText);
+//                                            var person = resp.person;
+//                                            if (person) {
+//                                                this.set('name', person.name);
+//                                                this.set('address', person.address);
+//                                            }
+//                                            this.fire('change');
+//                                            if (callback)
+//                                                callback();
+//                                        },
+//                                        failure: function(tid, xhr) {
+//                                            this.fire("error", xhr);
+//                                            if (callback)
+//                                            {
+//                                                var m = (xhr.responseText) ? xhr.responseText : xhr.statusText;
+//                                                callback(m);
+//                                            }
+//                                        },
+//                                    }
+//                                });
+//                            },
+                            save: function(callback) {
+                                Y.io(this.url, {
+                                    method: 'POST',
+                                    data: {"person": this.toJSON()},
+                                    context: this,
+                                    on: {
+                                        success: function(tid, xhr) {
+                                            // doesn't want to load the +id attr
+//                                    this.parse(xhr.responseText);
+//                                    this.parse(resp);
+                                            this.fire("change");
+                                            if (callback)
+                                                callback();
+                                        },
+                                        failure: function(tid, xhr) {
+                                            this.fire("error", xhr);
+                                            if (callback)
+                                            {
+                                                var m = (xhr.responseText) ? xhr.responseText : xhr.statusText;
+                                                callback(m);
+                                            }
+                                        }
+                                    }
+                                });
+                            },
+                            ATTR: {
+                                id: {},
+                                name: {value: null},
+                                address: {value: null},
+                            }
+                        });
+
+                        Y.PersonList = Y.Base.create('persons', Y.ModelList, [Y.ModelSync.REST], {
+//                     By convention `Y.User`'s `root` will be used for `Y.Users` as well.
+                            root: '/services/blog/person',
+                            url: '/services/blog/person',
+                            model: Y.Person,
+                            parse: function(response) {
+                                var obj = Y.JSON.parse(response);
+                                if (!obj.person)
+                                {
+                                    this.fire('error', {type: 'parse', error: 'Unexpected message format'})
+                                    return;
+                                }
+                                return obj.person;
+                            }
+                        });
+
+                        // code
+//                        var personList = new Y.PersonList();
+//                        personList.load(function(e) {
+//                            if (!e) {
+//                                message(Y.JSON.stringify(personList.toJSON()));
+//                            }
+//                            else {
+//                                message(e);
+//                            }
+//                        });
+
+                        var person = new Y.Person({id: 1});
+                        person.id = 1;
+                        person.load(function(e) {
+                            if (!e) {
+                                var msg = Y.JSON.stringify(person.toJSON());
+                                message(msg);
+                            }
+                            else {
+                                message(e);
+                            }
+                        });
+                    }
+            );
+            // define person
+        </script>
+    </body>
+</html>
