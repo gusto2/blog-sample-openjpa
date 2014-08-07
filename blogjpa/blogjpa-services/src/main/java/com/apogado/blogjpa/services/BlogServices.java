@@ -9,6 +9,7 @@ import com.apogado.blogjpa.commons.PersonService;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.NoResultException;
@@ -20,6 +21,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -28,48 +30,47 @@ import javax.ws.rs.core.Response;
  */
 @Path("/person")
 public class BlogServices {
-    
-    private static final Logger logger = Logger.getLogger(BlogServices.class.getName());
-    
-    @Path("/") @GET
-@Produces({"application/json","application/xml"})
-//@Consumes({"application/json","application/xml"})
 
+    private static final Logger logger = Logger.getLogger(BlogServices.class.getName());
+
+    @Path("/")
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+//@Consumes({"application/json","application/xml"})
     public Response list() {
         try {
-        
-         Collection<Person> p = new ArrayList<Person>( this.personService.getPersonRecords());
-        return Response.ok(p).build();
-        }
-        catch(Exception ex) {
-            logger.log(Level.SEVERE, "list",ex);
+
+            List<Person> p = (this.personService.getPersonRecords());
+            GenericEntity<List<Person>> pp = new GenericEntity<List<Person>>(p) {
+            };
+            return Response.ok(pp).build();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "list", ex);
             return Response.status(500).entity(ex.toString()).build();
         }
     }
-    
-    @Path("/{id}") @GET
-    
-@Produces({"application/json","application/xml"})
-//@Consumes({"application/json","application/xml"})
 
+    @Path("/{id}")
+    @GET
+    @Produces({"application/json", "application/xml"})
+//@Consumes({"application/json","application/xml"})
     public Response get(@PathParam("id") String id) {
         Person p = this.personService.getPerson(Integer.parseInt(id));
-        if(p==null)
+        if (p == null) {
             return Response.status(404).entity("Not found").build();
-        else
+        } else {
             return Response.ok(p).build();
+        }
     }
-    
-    @Path("/") @POST
-    
-@Produces({"application/json","application/xml"})
-@Consumes({"application/json","application/xml"})
 
+    @Path("/")
+    @POST
+    @Produces({"application/json", "application/xml"})
+    @Consumes({"application/json", "application/xml"})
     public Response create(Person p) {
         Person p2 = this.personService.createPerson(p);
-        return Response.created(URI.create("/person/"+String.valueOf(p2.getId()) )).build();
+        return Response.created(URI.create("/person/" + String.valueOf(p2.getId()))).build();
     }
-    
     PersonService personService;
 
     public PersonService getPersonService() {
@@ -79,7 +80,4 @@ public class BlogServices {
     public void setPersonService(PersonService personService) {
         this.personService = personService;
     }
-    
-    
-    
 }

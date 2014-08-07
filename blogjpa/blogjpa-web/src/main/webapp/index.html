@@ -8,14 +8,20 @@
         <link rel="stylesheet" href="./css/test.css" />
         <link rel="stylesheet" href="./css/bootstrap.css" />
         <script src="http://yui.yahooapis.com/3.17.2/build/yui/yui-min.js"></script>
-        <!--<script src="/js/person.js"></script>-->
+        <!--<script src="./js/person.js"></script>-->
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body class="yui3-skin-sam">
         <div id="message"></div>
+        <div id="app">
+            <div id="personTable"></div>
+            <div><button id="updateBtn" class="btn">Refresh</button></div>
+        </div>
+        <!--<script src="./js/person.js"></script>-->
         <script type="text/javascript">
             YUI().use('app', 'node', 'event', 'escape',
                     'model', 'model-list', 'model-sync-rest', 'io', 'json-parse',
+                    'datatable',
                     function(Y) {
 
                         function message(msg) {
@@ -26,7 +32,7 @@
                                 node.setHTML(Y.Escape.html(msg));
                         }
 
-                        // person model
+// model
                         Y.Person = Y.Base.create('person', Y.Model, [Y.ModelSync.REST], {
                             root: '/services/blog/person',
                             url: '/services/blog/person/{id}',
@@ -34,45 +40,12 @@
                             parse: function(response) {
                                 var resp = Y.JSON.parse(response);
                                 var person = resp.person;
-                                if(!person) {
+                                if (!person) {
                                     fire('error', {type: 'parse', error: 'Unexpected message format'})
                                 }
                                 else
                                     return person;
                             },
-//                            load: function(callback) {
-//                                var id = this.get('id');
-//                                if (!id) {
-//                                    callback('id is not defined');
-//                                    return;
-//                                }
-//                                var url = Y.Lang.sub(this.url, this);
-//                                Y.io(url, {
-//                                    method: 'GET',
-//                                    context: this,
-//                                    on: {
-//                                        success: function(tid, xhr) {
-//                                            var resp = Y.JSON.parse(xhr.responseText);
-//                                            var person = resp.person;
-//                                            if (person) {
-//                                                this.set('name', person.name);
-//                                                this.set('address', person.address);
-//                                            }
-//                                            this.fire('change');
-//                                            if (callback)
-//                                                callback();
-//                                        },
-//                                        failure: function(tid, xhr) {
-//                                            this.fire("error", xhr);
-//                                            if (callback)
-//                                            {
-//                                                var m = (xhr.responseText) ? xhr.responseText : xhr.statusText;
-//                                                callback(m);
-//                                            }
-//                                        },
-//                                    }
-//                                });
-//                            },
                             save: function(callback) {
                                 Y.io(this.url, {
                                     method: 'POST',
@@ -88,7 +61,7 @@
                                                 callback();
                                         },
                                         failure: function(tid, xhr) {
-                                            this.fire("error", xhr);
+                                            this.fire("error", {type: 'save', error: 'Cannot save the person', data: xhr});
                                             if (callback)
                                             {
                                                 var m = (xhr.responseText) ? xhr.responseText : xhr.statusText;
@@ -121,7 +94,78 @@
                             }
                         });
 
-                        // code
+
+// view
+                        Y.PersonListView = Y.Base.create("personListView", Y.View, [], {
+                            model: new Y.PersonList(),
+                            dataTable: new Y.DataTable({
+                                data: this.model,
+                                columns: [
+                                    {
+                                        key: 'name',
+                                        label: 'name',
+                                        allowHTML: true,
+                                        formatter: function(o) {
+                                            return '<a href="/detail/' + o.data.id + '">' + o.data.name + '</a>';
+                                        }
+                                    },
+                                    'address'],
+                                recordType: Y.Person
+                            }),
+                            initializer: function() {
+                                var model = this.model;
+                                if (!model) {
+                                    alert('personlist model is not defined');
+                                    return;
+                                }
+                                ;
+                                // Re-render this view when the model changes, and destroy this view when
+                                // the model is destroyed.
+//                                model.after('change', this.updateTable, this);
+                                model.after('destroy', this.destroy, this);
+                            },
+                            render: function() {
+                                var dataTable = this.dataTable;
+                                var model = this.model;
+                                dataTable.data = model;
+                                model.load(function(e) {
+                                    if (!e) {
+                                        dataTable.render('#personTable');
+                                        message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
+                                        model.fire('change');
+                                    }
+                                    else {
+                                        message(e);
+                                    }
+                                });
+                                
+                                Y.one('#updateBtn').on('click', function(evt) {
+                                        dataTable.data.load(function(e) {
+                                            if (!e) {
+                                                message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
+                                            }
+                                            else {
+                                                message(e);
+                                            }
+                                        });                                    
+                                });
+                            },
+                            events: {
+//                                'button': {click: function(evt) {
+//                                        dataTable.data.load(function(e) {
+//                                            if (!e) {
+//                                                message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
+//                                            }
+//                                            else {
+//                                                message(e);
+//                                            }
+//                                        });
+//                                        alert('updating table..');
+//                                    }}
+                            }
+                        });
+
+//                        // code
 //                        var personList = new Y.PersonList();
 //                        personList.load(function(e) {
 //                            if (!e) {
@@ -132,17 +176,16 @@
 //                            }
 //                        });
 
-                        var person = new Y.Person({id: 1});
-                        person.id = 1;
-                        person.load(function(e) {
-                            if (!e) {
-                                var msg = Y.JSON.stringify(person.toJSON());
-                                message(msg);
-                            }
-                            else {
-                                message(e);
-                            }
+
+                        var app = new Y.App({
+                            views: {
+                                home: {type: 'PersonListView'},
+                            },
+                            viewContainer: '#app',
+                            transitions: true,
+                            serverSupport: false
                         });
+                        app.showView('home');
                     }
             );
             // define person
