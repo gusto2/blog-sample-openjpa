@@ -7,19 +7,16 @@ package com.apogado.blogjpa.services;
 import com.apogado.blogjpa.commons.Person;
 import com.apogado.blogjpa.commons.PersonService;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,8 +66,20 @@ public class BlogServices {
     @Consumes({"application/json", "application/xml"})
     public Response create(Person p) {
         Person p2 = this.personService.createPerson(p);
-        return Response.created(URI.create("/person/" + String.valueOf(p2.getId()))).build();
+        return Response.created(URI.create("/person/" + String.valueOf(p2.getId()))).entity(p2).build();
     }
+    
+    @Path("/{id}") @DELETE 
+    public Response deletePerson(@PathParam("id") String id) {
+        try {
+            this.personService.deletePerson(Integer.parseInt(id));
+            return Response.ok().build();
+        }
+        catch(Exception ex) {
+            return Response.serverError().entity(ex).build();
+        }
+    }
+    
     PersonService personService;
 
     public PersonService getPersonService() {

@@ -12,10 +12,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body class="yui3-skin-sam">
-        <div id="message"></div>
+        <div id="message" class="section"></div>
         <div id="app">
-            <div id="personTable"></div>
-            <div><button id="updateBtn" class="btn">Refresh</button></div>
+
         </div>
         <!--<script src="./js/person.js"></script>-->
         <script type="text/javascript">
@@ -47,15 +46,19 @@
                                     return person;
                             },
                             save: function(callback) {
-                                Y.io(this.url, {
+                                var url = this.root;
+                                Y.io(url, {
                                     method: 'POST',
-                                    data: {"person": this.toJSON()},
+                                    data: Y.JSON.stringify({"person": this.toJSON()}),
                                     context: this,
+                                    headers: {
+                                        'Content-Type': 'application/json; charset=utf-8'
+                                    },
                                     on: {
                                         success: function(tid, xhr) {
                                             // doesn't want to load the +id attr
-//                                    this.parse(xhr.responseText);
-//                                    this.parse(resp);
+                                            var person = this.parse(xhr.responseText);
+                                            this.set('id', person.id);
                                             this.fire("change");
                                             if (callback)
                                                 callback();
@@ -98,20 +101,6 @@
 // view
                         Y.PersonListView = Y.Base.create("personListView", Y.View, [], {
                             model: new Y.PersonList(),
-                            dataTable: new Y.DataTable({
-                                data: this.model,
-                                columns: [
-                                    {
-                                        key: 'name',
-                                        label: 'name',
-                                        allowHTML: true,
-                                        formatter: function(o) {
-                                            return '<a href="/detail/' + o.data.id + '">' + o.data.name + '</a>';
-                                        }
-                                    },
-                                    'address'],
-                                recordType: Y.Person
-                            }),
                             initializer: function() {
                                 var model = this.model;
                                 if (!model) {
@@ -124,71 +113,199 @@
 //                                model.after('change', this.updateTable, this);
                                 model.after('destroy', this.destroy, this);
                             },
-                            render: function() {
-                                var dataTable = this.dataTable;
+                            render: function()
+                            {
+                                var viewSrc = Y.Node.create(Y.one('#mainViewContent').getHTML());
+                                var container = this.get('container');
+                                container.setHTML('');
+                                container.appendChild(viewSrc);
+
+
+                                var dataTable = new Y.DataTable({
+                                    data: this.model,
+                                    columns: [
+                                        {
+                                            key: 'name',
+                                            label: 'name',
+                                            allowHTML: true,
+                                            formatter: function(o) {
+                                                return '<a href="#/detail/' + o.data.id + '">' + o.data.name + '</a>';
+                                            }
+                                        },
+                                        'address'],
+                                    recordType: Y.Person
+                                });
                                 var model = this.model;
                                 dataTable.data = model;
                                 model.load(function(e) {
                                     if (!e) {
-                                        dataTable.render('#personTable');
-                                        message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
-                                        model.fire('change');
+                                        var tableNode = container.one('#personTable');
+                                        dataTable.render(tableNode);
+
                                     }
                                     else {
                                         message(e);
                                     }
                                 });
-                                
-                                Y.one('#updateBtn').on('click', function(evt) {
-                                        dataTable.data.load(function(e) {
+
+//                                Y.one('#updateBtn').on('click', function(evt) {
+//                                    dataTable.data.load(function(e) {
+//                                        if (!e) {
+//                                            message('');
+//                                        }
+//                                        else {
+//                                            message(e);
+//                                        }
+//                                    });
+//                                });
+
+//                                Y.one('#createBtn').on('click', function(evt) {
+//                                    var name = Y.one('#personName');
+//                                    var address = Y.one('#personAddress');
+//                                    var nameValue = name.get('value');
+//                                    if (!nameValue || nameValue == '') {
+//                                        message('Name is mandatory');
+//                                        return;
+//                                    }
+//                                    var person = new Y.Person({
+//                                        name: nameValue, address: address.get('value')});
+//
+//                                    person.save(function(e) {
+//                                        if (!e) {
+//                                            message('Created person id: ' + person.get('id'));
+//                                            name.set('value', '');
+//                                            address.set('value', '');
+//                                            model.add(person);
+//                                        } else {
+//                                            message(e);
+//                                        }
+//                                    });
+//                                });
+                            },
+                            events: {
+                                '#updateBtn': {click: function(evt) {
+                                        this.dataTable.data.load(function(e) {
                                             if (!e) {
-                                                message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
+                                                message('');
                                             }
                                             else {
                                                 message(e);
                                             }
-                                        });                                    
-                                });
-                            },
-                            events: {
-//                                'button': {click: function(evt) {
-//                                        dataTable.data.load(function(e) {
-//                                            if (!e) {
-//                                                message('Data rendered ' + Y.JSON.stringify(dataTable.data.toJSON()));
-//                                            }
-//                                            else {
-//                                                message(e);
-//                                            }
-//                                        });
-//                                        alert('updating table..');
-//                                    }}
+                                        });
+                                    }},
+                                '#createBtn': {click: function(evt) {
+                                        var model = this.model;
+                                        var name = Y.one('#personName');
+                                        var address = Y.one('#personAddress');
+                                        var nameValue = name.get('value');
+                                        if (!nameValue || nameValue == '') {
+                                            message('Name is mandatory');
+                                            return;
+                                        }
+                                        var person = new Y.Person({
+                                            name: nameValue, address: address.get('value')});
+
+                                        person.save(function(e) {
+                                            if (!e) {
+                                                message('Created person id: ' + person.get('id'));
+                                                name.set('value', '');
+                                                address.set('value', '');
+                                                model.add(person);
+                                            } else {
+                                                message(e);
+                                            }
+                                        });
+                                    }}
+
                             }
                         });
 
-//                        // code
-//                        var personList = new Y.PersonList();
-//                        personList.load(function(e) {
-//                            if (!e) {
-//                                message(Y.JSON.stringify(personList.toJSON()));
-//                            }
-//                            else {
-//                                message(e);
-//                            }
-//                        });
+                        Y.PersonDetailView = Y.Base.create("personDetailView", Y.View, [], {
+                            model: new Y.Person(),
+                            render: function() {
+
+                                var viewSrc = Y.Node.create(Y.one('#detailViewContent').getHTML());
+                                var container = this.get('container');
+                                container.setHTML('');
+                                container.appendChild(viewSrc);
+
+                                var personId = this.get('personId');
+                                var model = this.model;
+                                if (!personId)
+                                {
+                                    message('Person id not specified');
+                                    return;
+                                }
+                                model.set('id', personId);
+                                model.load(function(e) {
+                                    if (!e) {
+                                        var person = model.toJSON();
+                                        Y.one('#personDetailId').setHTML(Y.Escape.html(person.id));
+                                        Y.one('#personDetailName').setHTML(Y.Escape.html(person.name));
+                                        Y.one('#personDetailAddress').setHTML(Y.Escape.html(person.address));
+                                        message('');
+                                    }
+                                    else {
+                                        message(e);
+                                    }
+                                });
+                            },
+                            events: {
+                                '#deleteBtn': {click: function(evt){
+                                        var model = this.model;
+                                        model.destroy({delete: true});
+//                                        app.showView('home');
+                                        app.navigate('/index.html');
+                                }}
+                            }
+                        });
 
 
                         var app = new Y.App({
                             views: {
                                 home: {type: 'PersonListView'},
+                                detail: {type: 'PersonDetailView', parent: 'home'}
                             },
                             viewContainer: '#app',
                             transitions: true,
-                            serverSupport: false
+                            serverSupport: false,
+                            root: '/mvn_com.apogado.blogjpa_blogjpa-web_1.0.0-SNAPSHOT_war'
                         });
-                        app.showView('home');
+
+                        app.route('/index.html', function(req, resp, data) {
+                            app.showView('home');
+                        });
+                        app.route('/detail/:id', function(req, resp, data) {
+                            var personId = req.params.id;
+                            app.showView('detail',
+                                    {personId: personId},
+                            {update: true});
+                        });
+                        app.render().dispatch();
+
                     }
             );
             // define person
         </script>
+
+        <script type="text/x-template" id="mainViewContent">
+<div class="section">
+    name: <input type="text" required id="personName"><br>
+    address: <input type="text" id="personAddress"><br>
+    <button id="createBtn" class="btn">Create</button>
+</div>
+<div id="personTable" class="section"></div>
+<div><button id="updateBtn" class="btn">Refresh</button></div>
+        </script>
+
+        <script type="text/x-template" id="detailViewContent">
+<div class="section">
+    <a href="#/index.html">Back to list</a><br>
+    id: <span id="personDetailId"></span><br>
+    name: <span id="personDetailName"></span><br>
+    address: <span id="personDetailAddress"></span><br>
+    <button id="deleteBtn" class="btn">Delete</button>
+</div>
+        </script>        
     </body>
 </html>

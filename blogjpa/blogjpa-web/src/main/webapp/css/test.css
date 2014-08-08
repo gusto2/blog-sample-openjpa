@@ -31,3 +31,7 @@ root {
 #message {
     color: red;
 }
+
+.section {
+    margin-bottom: 20px;
+}

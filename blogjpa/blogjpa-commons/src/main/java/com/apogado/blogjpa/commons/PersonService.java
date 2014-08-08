@@ -28,4 +28,6 @@ public interface PersonService {
      * @return 
      */
     public List<Person> getPersonRecords();
+    
+    public void deletePerson(Integer id);
 }

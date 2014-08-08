@@ -3,10 +3,6 @@ package com.apogado.blogjpa.store;
 
 import com.apogado.blogjpa.commons.Person;
 import com.apogado.blogjpa.commons.PersonService;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +22,8 @@ public class PersonServiceImpl implements PersonService {
     private EntityManagerFactory entityManagerFactory;
     
     public Person createPerson(Person p) {
+        if(p.getName()==null || "".equals(p.getName()))
+            throw new RuntimeException("Name is mandatory");
         EntityManager em = null;
         try
         {
@@ -127,6 +125,30 @@ public class PersonServiceImpl implements PersonService {
         }
     }
     
+    @Override
+    public void deletePerson(Integer id) {
+        EntityManager em = null;
+        try
+        {
+            em = this.entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
+            Person p = em.find(Person.class, id);
+            em.remove(p);
+            em.getTransaction().commit();
+            
+            logger.log(Level.INFO, "Person deleted {0}",id);
+        } catch(Exception ex) {
+            logger.log(Level.SEVERE, "deletePerson");
+            throw new RuntimeException(ex);
+        }
+        finally {
+            if(em!=null)
+                em.close();
+        }
+    }
+    
+        
+    
     /**
      * test method to test if it all works
      */
@@ -167,7 +189,7 @@ public class PersonServiceImpl implements PersonService {
     public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
-    
+
     
     
 }
