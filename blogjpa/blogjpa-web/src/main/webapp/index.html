@@ -136,6 +136,7 @@
                                     recordType: Y.Person
                                 });
                                 var model = this.model;
+                                
                                 dataTable.data = model;
                                 model.load(function(e) {
                                     if (!e) {
@@ -184,7 +185,8 @@
                             },
                             events: {
                                 '#updateBtn': {click: function(evt) {
-                                        this.dataTable.data.load(function(e) {
+                                        var model = this.model;
+                                        model.load(function(e) {
                                             if (!e) {
                                                 message('');
                                             }
