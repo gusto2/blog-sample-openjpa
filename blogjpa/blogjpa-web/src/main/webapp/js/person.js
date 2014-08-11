@@ -4,8 +4,7 @@
 
 YUI.add('person', function(Y) {
 
-
-                        // person model
+// model
                         Y.Person = Y.Base.create('person', Y.Model, [Y.ModelSync.REST], {
                             root: '/services/blog/person',
                             url: '/services/blog/person/{id}',
@@ -13,28 +12,33 @@ YUI.add('person', function(Y) {
                             parse: function(response) {
                                 var resp = Y.JSON.parse(response);
                                 var person = resp.person;
-                                if(!person) {
+                                if (!person) {
                                     fire('error', {type: 'parse', error: 'Unexpected message format'})
                                 }
                                 else
                                     return person;
                             },
                             save: function(callback) {
-                                Y.io(this.url, {
+                                var url = this.root;
+                                Y.io(url, {
                                     method: 'POST',
-                                    data: {"person": this.toJSON()},
+                                    data: Y.JSON.stringify({"person": this.toJSON()}),
                                     context: this,
+                                    headers: {
+                                        'Content-Type': 'application/json; charset=utf-8',
+                                        'Accept': 'application/json',
+                                    },
                                     on: {
                                         success: function(tid, xhr) {
                                             // doesn't want to load the +id attr
-//                                    this.parse(xhr.responseText);
-//                                    this.parse(resp);
+                                            var person = this.parse(xhr.responseText);
+                                            this.set('id', person.id);
                                             this.fire("change");
                                             if (callback)
                                                 callback();
                                         },
                                         failure: function(tid, xhr) {
-                                            this.fire("error", { type: 'save', error: 'Cannot save the person', data: xhr});
+                                            this.fire("error", {type: 'save', error: 'Cannot save the person', data: xhr});
                                             if (callback)
                                             {
                                                 var m = (xhr.responseText) ? xhr.responseText : xhr.statusText;
@@ -66,6 +70,10 @@ YUI.add('person', function(Y) {
                                 return obj.person;
                             }
                         });
+
+
+
+
                         
 }, '0.0.1', {requires: ['model','model-list','model-sync-rest','io','json-parse']});
 
