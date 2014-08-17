@@ -10,7 +10,13 @@
         <feature>jndi</feature>
         <feature>transaction</feature>
         <feature>cxf-jaxrs</feature>
+        
+        <!-- install before this feature, so the war namespace handler is already active for the web client -->
         <feature>war</feature>
+        
+        <!-- talend ESB features to embed the Derby database -->
+        <feature>tesb-datasource-derby</feature>
+        <feature>tesb-derby-starter</feature>
         
         <!-- openjpa library dependencies -->
         <bundle>mvn:commons-collections/commons-collections/3.2.1</bundle>
