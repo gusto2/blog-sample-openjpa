@@ -168,7 +168,7 @@
                                 '#deleteBtn': {click: function(evt) {
                                         var model = this.model;
                                         var context = this;
-                                        model.destroy({delete: true}, function(e) {
+                                        model.destroy({delete: 'true'}, function(e) {
                                             if (!e) {
                                                 app.save('/index.jsp');
                                             }
